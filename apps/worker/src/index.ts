@@ -65,6 +65,7 @@ api.route('/billing',       billingRouter);
 
 // Public webhook routes (no auth)
 app.route('/webhooks/whatsapp', whatsappRouter);
+app.route('/api/v1/whatsapp', whatsappRouter);
 
 // Mount API
 app.route('/api/v1', api);

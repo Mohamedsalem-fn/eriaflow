@@ -55,12 +55,20 @@ async function processWhatsAppMessage(env: Env, payload: WhatsAppWebhookPayload)
     const msgText       = incomingMsg.text?.body ?? '';
     const whatsappMsgId = incomingMsg.id;
 
-    // Find tenant by WhatsApp phone number ID
-    const tenant = await env.DB.prepare(
+    // Find tenant by WhatsApp phone number ID (or fallback to first tenant)
+    let tenant = await env.DB.prepare(
       `SELECT id, plan, ai_provider, monthly_conversations FROM tenants WHERE whatsapp_phone_id = ?`
     ).bind(phoneNumberId).first<{
       id: string; plan: string; ai_provider: string; monthly_conversations: number;
     }>();
+
+    if (!tenant) {
+      tenant = await env.DB.prepare(
+        `SELECT id, plan, ai_provider, monthly_conversations FROM tenants LIMIT 1`
+      ).first<{
+        id: string; plan: string; ai_provider: string; monthly_conversations: number;
+      }>();
+    }
 
     if (!tenant) {
       console.warn(`[WhatsApp] No tenant found for phone_number_id: ${phoneNumberId}`);
@@ -164,6 +172,21 @@ async function processWhatsAppMessage(env: Env, payload: WhatsAppWebhookPayload)
 
 // ─── WhatsApp Message Sender ──────────────────────────────────────────────────
 async function sendWhatsAppMessage(env: Env, phoneNumberId: string, to: string, text: string) {
+  if (phoneNumberId === 'baileys-session') {
+    // Send via VPS Baileys Gateway
+    try {
+      await fetch('http://173.230.133.114:3001/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ to, text }),
+      });
+      console.log(`[Baileys Outgoing] Sent message to ${to}`);
+    } catch (err) {
+      console.error('[Baileys Outgoing Error]', err);
+    }
+    return;
+  }
+
   const url = `https://graph.facebook.com/v21.0/${phoneNumberId}/messages`;
 
   const response = await fetch(url, {
