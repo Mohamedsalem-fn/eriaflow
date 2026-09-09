@@ -120,7 +120,7 @@ async function connectToWhatsApp() {
                     messages: [
                       {
                         id: msg.key.id,
-                        from: from.replace('@s.whatsapp.net', ''),
+                        from: msg.key.remoteJid,
                         type: 'text',
                         text: { body: text },
                       },
@@ -185,8 +185,9 @@ app.post('/send', async (req: Request, res: Response) => {
   }
 
   try {
-    const jid = to.includes('@s.whatsapp.net') ? to : `${to}@s.whatsapp.net`;
+    const jid = to.includes('@') ? to : `${to}@s.whatsapp.net`;
     await sock.sendMessage(jid, { text });
+    console.log(`[Baileys Sent] Success to JID: ${jid}`);
     res.json({ success: true, jid });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
