@@ -14,20 +14,20 @@
     "db:seed": "wrangler d1 execute eriaflow-db --file=./src/db/seed.sql --local"
   },
   "dependencies": {
-    "hono": "^4.7.4",
-    "@hono/zod-validator": "^0.4.3",
-    "@eriaflow/shared": "workspace:*",
-    "ai": "^4.3.16",
-    "@ai-sdk/openai": "^1.3.22",
     "@ai-sdk/anthropic": "^1.2.12",
     "@ai-sdk/google": "^1.2.18",
-    "stripe": "^17.7.0",
+    "@ai-sdk/openai": "^1.3.22",
+    "@eriaflow/shared": "workspace:*",
+    "@hono/zod-validator": "^0.4.3",
+    "ai": "^4.3.16",
+    "hono": "^4.7.4",
     "nanoid": "^5.1.5",
+    "stripe": "^17.7.0",
     "zod": "^3.24.2"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250224.0",
-    "wrangler": "^4.2.0",
-    "typescript": "^5.7.3"
+    "@cloudflare/workers-types": "^5.20260908.1",
+    "typescript": "^5.7.3",
+    "wrangler": "^4.2.0"
   }
 }
