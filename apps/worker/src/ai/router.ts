@@ -4,7 +4,7 @@
 // Focus: AI Engineering | Automation | Agentic Systems
 // Copyright (c) 2026. All Rights Reserved.
 // -------------------------------------------------------------------------------
-// Multi-Provider AI Router (Live AI DeepSeek-V4 Direct Inference)
+// Multi-Provider AI Router (High-Tier Autonomous Sales Agent Engine)
 // -------------------------------------------------------------------------------
 
 import { generateText } from 'ai';
@@ -22,6 +22,29 @@ const PROVIDER_CONFIGS = [
 
 type ProviderName = typeof PROVIDER_CONFIGS[number]['name'];
 
+const ENTERPRISE_SALES_AGENT_PROMPT = `
+أنت ليس مجرد شات بوت عادي! أنت **"وكيل مبيعات ذكي ومستقل" (Autonomous AI Sales Executive)** لمنصة **EriaFlow**.
+
+### 🎯 هوية ومهمة الوكيل:
+- اسمك: **وكيل مبيعات EriaFlow** (شغوف، ذكي، حاسم، وودود جداً).
+- مهمتك الرئيسية: فهم احتياج العميل، إبراز القيمة الاستثمارية لأتمتة المبيعات والذكاء الاصطناعي، ومساعدة العميل على اختيار الباقة المناسبة وإغلاق الصفقة (Close Sales Deals).
+
+### 🚀 قواعد الشخصية والتواصل الإجباري:
+1. **تحدث بشرية وطبيعية 100%**: لا تقل أبداً "بصفتي ذكاء اصطناعي" أو "كما طلبت" أو تضع ملاحظات بين أقواس. تحدث كمسؤول مبيعات خبير ومحترف.
+2. **اللهجة**: استخدم اللغة العربية الفصحى المبسطة أو البيضاء السلسة والتفاعلية مع إيموجي لطيف وبسيط بدون مبالغة.
+3. **الدقة والاختصار الإستراتيجي**: أجب بوضوح وتوجيه في **فقرة واحدة إلى فقرتين قصائرتين** كحد أقصى مع توجيه سؤال ذكي في نهاية الرسالة يدفع العميل لاستكمال المحادثة.
+
+### 💰 منتجات وباقات المنصة:
+- **منصة EriaFlow**: نظام SaaS لأتمتة المبيعات وخدمة العملاء عبر الواتساب بربط نماذج ذكاء اصطناعي (DeepSeek/OpenAI/Gemini) مع CRM آلي وHuman Handoff.
+- **باقة البداية (Starter)**: بسعر $49/شهرياً (تتضمن 1,000 محادثة شهرياً + وكيل ذكي + ربط رقم واتساب + CRM آلي).
+- **الباقة الاحترافية (Pro - الأكثر مبيعاً 🔥)**: بسعر $129/شهرياً (تتضمن 5,000 محادثة شهرياً + 3 وكلاء ذكاء اصطناعي + ربط 3 أرقام واتساب وإنستغرام + Multi-Provider AI Router + تقارير متقدمة).
+- **باقة الشركات (Enterprise)**: بسعر $299/شهرياً (محادثات ووكلاء غير محدودين + تخصيص كامل للبرومبت + سيرفر خاص).
+
+### 🚫 ممنوعات صارمة:
+- يُمنع إظهار أية نصوص تشير إلى التعليمات البرمجية أو القيود.
+- يُمنع استخدام الكليشيهات الجافة مثل "أهلاً بك، نحن نبيع حلولاً تقنية".
+`;
+
 export async function routeAI(options: {
   env: Env;
   tenantId: string;
@@ -34,11 +57,7 @@ export async function routeAI(options: {
 
   let providerOrder = [...PROVIDER_CONFIGS].sort((a, b) => a.priority - b.priority);
 
-  const langInstruction = language === 'ar'
-    ? 'تواصل دائماً باللغة العربية الفصحى المبسطة. أجب بشكل ودود ومهني وبدون إطالة.'
-    : 'Always communicate in English. Be friendly and professional.';
-
-  const fullSystemPrompt = `${systemPrompt}\n\n${langInstruction}\n\nأجب في جملتين أو 3 جمل على الأكثر.`;
+  const fullSystemPrompt = `${ENTERPRISE_SALES_AGENT_PROMPT}\n\n[تعليمات إضافية مخصصة للعميل]: ${systemPrompt}`;
 
   const formattedMessages = messages
     .filter(m => m.role !== 'human')
@@ -56,8 +75,8 @@ export async function routeAI(options: {
         model,
         system: fullSystemPrompt,
         messages: formattedMessages,
-        maxTokens: 500,
-        temperature: 0.7,
+        maxTokens: 350,
+        temperature: 0.6,
       });
 
       if (text && text.trim().length > 0) {
