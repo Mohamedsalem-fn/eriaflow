@@ -2,12 +2,13 @@ name = "eriaflow-worker"
 main = "src/index.ts"
 compatibility_date = "2025-09-01"
 compatibility_flags = ["nodejs_compat"]
+account_id = "49c88b6d64e562f816def0c5a77811d4"
 
 # ─── D1 Database ─────────────────────────────────────────────────────────────
 [[d1_databases]]
 binding = "DB"
 database_name = "eriaflow-db"
-database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+database_id = "80f714a5-c1f1-4fed-85c4-b6cdfbfa1dce"
 
 # ─── Queues (Follow-up automation) ───────────────────────────────────────────
 [[queues.producers]]
@@ -23,7 +24,7 @@ max_retries = 3
 # ─── KV (Rate limiting & caching) ────────────────────────────────────────────
 [[kv_namespaces]]
 binding = "CACHE"
-id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
+id = "d04bebd62cdf4f0096449a3550d52853"
 
 # ─── Environment Variables (secrets via wrangler secret put) ─────────────────
 [vars]

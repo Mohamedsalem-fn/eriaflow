@@ -39,7 +39,7 @@ export default function DashboardPage() {
     let cleanupFn: (() => void) | undefined;
 
     import('animejs').then(({ animate, stagger, onScroll }) => {
-      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      if (typeof window !== 'undefined' && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         // Staggered entrance for stat cards
         animate('.stat-card', {
           opacity: [0, 1],

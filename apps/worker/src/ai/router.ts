@@ -14,12 +14,17 @@ import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import type { Env } from '../types/env';
 
 // ─── Provider Config ──────────────────────────────────────────────────────────
+// Eria is the default: Cloudflare Worker proxy → agentrouter.org (OpenAI-compatible)
 const PROVIDER_CONFIGS = [
-  { name: 'deepseek', model: 'deepseek-chat',        costPer1kTokens: 0.00014, priority: 1 },
-  { name: 'gemini',   model: 'gemini-2.0-flash',     costPer1kTokens: 0.00015, priority: 2 },
-  { name: 'openai',   model: 'gpt-4o-mini',          costPer1kTokens: 0.00015, priority: 3 },
-  { name: 'claude',   model: 'claude-haiku-3-5',     costPer1kTokens: 0.00025, priority: 4 },
+  { name: 'eria',     model: 'gpt-4o-mini',          costPer1kTokens: 0.00000, priority: 1 },  // Free via Eria Gateway
+  { name: 'deepseek', model: 'deepseek-chat',         costPer1kTokens: 0.00014, priority: 2 },
+  { name: 'gemini',   model: 'gemini-2.0-flash',      costPer1kTokens: 0.00015, priority: 3 },
+  { name: 'openai',   model: 'gpt-4o-mini',           costPer1kTokens: 0.00015, priority: 4 },
+  { name: 'claude',   model: 'claude-haiku-3-5',      costPer1kTokens: 0.00025, priority: 5 },
 ] as const;
+
+// Eria Gateway URL (deployed Cloudflare Worker)
+const ERIA_GATEWAY_URL = 'https://eria-ai-gateway.mohamedsalem-fn.workers.dev/v1';
 
 type ProviderName = typeof PROVIDER_CONFIGS[number]['name'];
 
@@ -94,6 +99,15 @@ export async function routeAI(options: {
 // ─── Build Model Instance ─────────────────────────────────────────────────────
 function buildModel(provider: ProviderName, modelId: string, env: Env) {
   switch (provider) {
+    case 'eria': {
+      // Eria is always available — uses the Cloudflare Worker proxy, no API key needed
+      const eria = createOpenAI({
+        apiKey: 'eria-gateway',   // placeholder — gateway handles auth
+        baseURL: ERIA_GATEWAY_URL,
+      });
+      return eria(modelId);
+    }
+
     case 'deepseek': {
       if (!env.DEEPSEEK_API_KEY) return null;
       // DeepSeek is OpenAI-compatible
