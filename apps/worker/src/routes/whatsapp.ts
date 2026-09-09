@@ -155,8 +155,17 @@ async function processWhatsAppMessage(env: Env, payload: WhatsAppWebhookPayload)
     });
 
     if (!aiReply) {
-      console.warn('[WhatsApp] AI Provider fallback triggered');
-      aiReply = 'أهلاً بك! شكراً لتواصلك معنا. نحن هنا لمساعدتك في أي استفسار حول خدماتنا ومبيعات المنصة.';
+      console.warn('[WhatsApp] AI Provider fallback triggered - using Sales Agent Knowledge Engine');
+      const lower = msgText.toLowerCase();
+      if (lower.includes('سعر') || lower.includes('اسعار') || lower.includes('باقة') || lower.includes('باقات') || lower.includes('بكام') || lower.includes('تكلفة')) {
+        aiReply = 'أهلاً بك! نوفر في EriaFlow باقتين رئيسيتين:\n1. باقة البداية Starter بسعر $49/شهرياً (1,000 محادثة + وكيل ذكي).\n2. الباقة الاحترافية Pro بسعر $129/شهرياً (5,000 محادثة + 3 وكلاء + Multi-Provider AI).\nهل تود تجربة الباقة الاحترافية مجاناً؟';
+      } else if (lower.includes('اسم') || lower.includes('من انت') || lower.includes('مين')) {
+        aiReply = 'أهلاً بك! أنا وكيل المبيعات الآلي المباشر لـ EriaFlow. أساعدك في إجابة استفساراتك وأتمتة محادثات عملائك 24/7.';
+      } else if (lower.includes('بيع') || lower.includes('بتبيع') || lower.includes('خدمات') || lower.includes('عايز')) {
+        aiReply = 'منصة EriaFlow هي نظام SaaS متكامل لأتمتة المبيعات وخدمة العملاء بالذكاء الاصطناعي عبر الواتساب والانستغرام، مع CRM آلي وربط مع نماذج (DeepSeek, OpenAI, Gemini).';
+      } else {
+        aiReply = 'أهلاً وسهلاً بك! كيف يمكنني مساعدتك اليوم في تنمية مبيعاتك وأتمتة خدمة عملاء مشروعك عبر EriaFlow؟';
+      }
     }
 
     // Save AI reply to messages

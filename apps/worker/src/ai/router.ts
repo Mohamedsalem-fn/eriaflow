@@ -73,7 +73,7 @@ export async function routeAI(options: {
   for (const providerConfig of providerOrder) {
     try {
       const model = buildModel(providerConfig.name, providerConfig.model, env);
-      if (!model) continue;  // API key not configured
+      if (!model) continue;
 
       const { text } = await generateText({
         model,
@@ -83,16 +83,16 @@ export async function routeAI(options: {
         temperature: 0.7,
       });
 
-      console.log(`[AI Router] Used provider: ${providerConfig.name}, model: ${providerConfig.model}`);
-      return text;
-
+      if (text && text.trim().length > 0) {
+        console.log(`[AI Router] Success via provider: ${providerConfig.name}, model: ${providerConfig.model}`);
+        return text;
+      }
     } catch (err) {
       console.warn(`[AI Router] Provider ${providerConfig.name} failed:`, (err as Error).message);
-      // Continue to next provider
     }
   }
 
-  console.error('[AI Router] All providers failed');
+  console.error('[AI Router] All AI providers failed or missing keys');
   return null;
 }
 
