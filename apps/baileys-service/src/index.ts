@@ -161,6 +161,12 @@ async function connectToWhatsApp() {
         const workerData = await res.json() as any;
         if (workerData?.reply) {
           addLog('system', `تم توليد الرد من الوركر (${res.status}): "${workerData.reply}"`);
+
+          // Send reply directly to WhatsApp
+          if (sock && connectionStatus === 'connected') {
+            await sock.sendMessage(from, { text: workerData.reply });
+            addLog('outgoing', `تم إرسال الرد التلقائي إلى (${from}): ${workerData.reply}`);
+          }
         } else {
           addLog('system', `تم توجيه الرسالة للوركر - حالة الاستجابة: ${res.status}`);
         }
