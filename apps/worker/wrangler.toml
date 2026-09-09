@@ -1,0 +1,49 @@
+name = "eriaflow-worker"
+main = "src/index.ts"
+compatibility_date = "2025-09-01"
+compatibility_flags = ["nodejs_compat"]
+
+# ─── D1 Database ─────────────────────────────────────────────────────────────
+[[d1_databases]]
+binding = "DB"
+database_name = "eriaflow-db"
+database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+
+# ─── Queues (Follow-up automation) ───────────────────────────────────────────
+[[queues.producers]]
+binding = "FOLLOWUP_QUEUE"
+queue = "eriaflow-followups"
+
+[[queues.consumers]]
+queue = "eriaflow-followups"
+max_batch_size = 10
+max_batch_timeout = 30
+max_retries = 3
+
+# ─── KV (Rate limiting & caching) ────────────────────────────────────────────
+[[kv_namespaces]]
+binding = "CACHE"
+id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
+
+# ─── Environment Variables (secrets via wrangler secret put) ─────────────────
+[vars]
+ENVIRONMENT = "development"
+API_VERSION = "v1"
+CORS_ORIGIN = "http://localhost:3000"
+
+# ─── Secrets (set via: wrangler secret put SECRET_NAME) ─────────────────────
+# SUPABASE_JWT_SECRET
+# OPENAI_API_KEY
+# ANTHROPIC_API_KEY
+# GOOGLE_GENERATIVE_AI_API_KEY
+# DEEPSEEK_API_KEY
+# WHATSAPP_VERIFY_TOKEN
+# WHATSAPP_ACCESS_TOKEN
+# STRIPE_SECRET_KEY
+# STRIPE_WEBHOOK_SECRET
+
+# ─── Production overrides ────────────────────────────────────────────────────
+[env.production]
+[env.production.vars]
+ENVIRONMENT = "production"
+CORS_ORIGIN = "https://eriaflow.pages.dev"
