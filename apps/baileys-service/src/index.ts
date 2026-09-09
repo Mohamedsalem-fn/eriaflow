@@ -158,7 +158,12 @@ async function connectToWhatsApp() {
           body: JSON.stringify(payload),
         });
 
-        addLog('system', `تم توجيه الرسالة إلى محرك Cloudflare Worker - حالة الاستجابة: ${res.status}`);
+        const workerData = await res.json() as any;
+        if (workerData?.reply) {
+          addLog('system', `تم توليد الرد من الوركر (${res.status}): "${workerData.reply}"`);
+        } else {
+          addLog('system', `تم توجيه الرسالة للوركر - حالة الاستجابة: ${res.status}`);
+        }
       } catch (err: any) {
         addLog('error', `خطأ في تحويل الرسالة إلى Cloudflare Worker: ${err.message}`);
       }

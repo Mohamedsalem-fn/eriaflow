@@ -32,11 +32,15 @@ router.get('/', (c) => {
 router.post('/', async (c) => {
   const body = await c.req.json<WhatsAppWebhookPayload>();
 
-  // Acknowledge immediately (WhatsApp requires < 200ms response)
-  // Process asynchronously using waitUntil
-  c.executionCtx.waitUntil(processWhatsAppMessage(c.env, body));
+  // Process message and return reply inline
+  const result = await processWhatsAppMessage(c.env, body);
 
-  return c.json({ status: 'ok' }, 200);
+  return c.json({
+    status: 'ok',
+    reply: result?.reply || null,
+    contact: result?.fromPhone || null,
+    processed: !!result,
+  }, 200);
 });
 
 // ─── Message Processing ───────────────────────────────────────────────────────
@@ -168,8 +172,11 @@ async function processWhatsAppMessage(env: Env, payload: WhatsAppWebhookPayload)
     // Send reply via WhatsApp API
     await sendWhatsAppMessage(env, phoneNumberId, fromPhone, aiReply);
 
+    return { reply: aiReply, fromPhone };
+
   } catch (err) {
     console.error('[WhatsApp Processor Error]', err);
+    return null;
   }
 }
 
