@@ -141,16 +141,19 @@ async function processWhatsAppMessage(env: Env, payload: WhatsAppWebhookPayload)
     }>();
 
     // Route to AI and get reply
-    const aiReply = await routeAI({
+    let aiReply = await routeAI({
       env,
       tenantId: tenant.id,
-      preferredProvider: tenant.ai_provider as string,
+      preferredProvider: (tenant.ai_provider || 'auto') as string,
       messages: history.reverse(),
-      systemPrompt: agentConfig?.personality ?? 'You are a helpful sales assistant.',
+      systemPrompt: agentConfig?.personality ?? 'أنت وكيل مبيعات متخصص ومحترف لمنصة EriaFlow. أجب بشكل ودود ومختصر باللغة العربية.',
       language: (agentConfig?.language ?? 'ar') as 'ar' | 'en' | 'both',
     });
 
-    if (!aiReply) return;
+    if (!aiReply) {
+      console.warn('[WhatsApp] AI Provider fallback triggered');
+      aiReply = 'أهلاً بك! شكراً لتواصلك معنا. نحن هنا لمساعدتك في أي استفسار حول خدماتنا ومبيعات المنصة.';
+    }
 
     // Save AI reply to messages
     await env.DB.prepare(
